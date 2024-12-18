@@ -92,22 +92,29 @@ class BasicSettings(BaseFileSettings):
     KB_ROOT_PATH: str = str(CHATCHAT_ROOT / "data/knowledge_base")
     """知识库默认存储路径"""
 
-    DB_ROOT_PATH: str = str(CHATCHAT_ROOT / "data/knowledge_base/info.db")
+    # DB_ROOT_PATH: str = str(CHATCHAT_ROOT / "data/knowledge_base/info.db")
     """数据库默认存储路径。如果使用sqlite，可以直接修改DB_ROOT_PATH；如果使用其它数据库，请直接修改SQLALCHEMY_DATABASE_URI。"""
 
-    SQLALCHEMY_DATABASE_URI:str = "sqlite:///" + str(CHATCHAT_ROOT / "data/knowledge_base/info.db")
+    # SQLALCHEMY_DATABASE_URI:str = "sqlite:///" + str(CHATCHAT_ROOT / "data/knowledge_base/info.db")
+    SQLALCHEMY_DATABASE_URI: str = "mysql+pymysql://root:dx17040207@hostname:3306/chatchat"
+
     """知识库信息数据库连接URI"""
 
     OPEN_CROSS_DOMAIN: bool = False
     """API 是否开启跨域"""
 
-    DEFAULT_BIND_HOST: str = "0.0.0.0" if sys.platform != "win32" else "127.0.0.1"
+    DEFAULT_BIND_HOST: str = "0.0.0.0"
     """
     各服务器默认绑定host。如改为"0.0.0.0"需要修改下方所有XX_SERVER的host
     Windows 下 WEBUI 自动弹出浏览器时，如果地址为 "0.0.0.0" 是无法访问的，需要手动修改地址栏
     """
 
-    API_SERVER: dict = {"host": DEFAULT_BIND_HOST, "port": 7861, "public_host": "127.0.0.1", "public_port": 7861}
+    API_SERVER: dict = { 
+        "host": DEFAULT_BIND_HOST,
+        "port": 7861,
+        "public_host": "0.0.0.0",
+        "public_port": 7861,
+    }
     """API 服务器地址。其中 public_host 用于生成云服务公网访问链接（如知识库文档链接）"""
 
     WEBUI_SERVER: dict = {"host": DEFAULT_BIND_HOST, "port": 8501}
@@ -264,7 +271,7 @@ class PlatformConfig(MyBaseModel):
     platform_type: t.Literal["xinference", "ollama", "oneapi", "fastchat", "openai", "custom openai"] = "xinference"
     """平台类型"""
 
-    api_base_url: str = "http://127.0.0.1:9997/v1"
+    api_base_url: str = "http://192.168.170.13:9997/v1"
     """openai api url"""
 
     api_key: str = "EMPTY"
@@ -276,13 +283,13 @@ class PlatformConfig(MyBaseModel):
     api_concurrencies: int = 5
     """该平台单模型最大并发数"""
 
-    auto_detect_model: bool = False
+    auto_detect_model: bool = True
     """是否自动获取平台可用模型列表。设为 True 时下方不同模型类型可自动检测"""
 
-    llm_models: t.Union[t.Literal["auto"], t.List[str]] = []
+    llm_models: t.Union[t.Literal["auto"], t.List[str]] = ["glm4-chat-1-0"]
     """该平台支持的大语言模型列表，auto_detect_model 设为 True 时自动检测"""
 
-    embed_models: t.Union[t.Literal["auto"], t.List[str]] = []
+    embed_models: t.Union[t.Literal["auto"], t.List[str]] = ["glm4-chat-1-0"]
     """该平台支持的嵌入模型列表，auto_detect_model 设为 True 时自动检测"""
 
     text2image_models: t.Union[t.Literal["auto"], t.List[str]] = []
@@ -306,10 +313,10 @@ class ApiModelSettings(BaseFileSettings):
 
     model_config = SettingsConfigDict(yaml_file=CHATCHAT_ROOT / "model_settings.yaml")
 
-    DEFAULT_LLM_MODEL: str = "glm4-chat"
+    DEFAULT_LLM_MODEL: str = "glm4-chat-1-0"
     """默认选用的 LLM 名称"""
 
-    DEFAULT_EMBEDDING_MODEL: str = "bge-m3"
+    DEFAULT_EMBEDDING_MODEL: str = "glm4-chat-1-0"
     """默认选用的 Embedding 名称"""
 
     Agent_MODEL: str = "" # TODO: 似乎与 LLM_MODEL_CONFIG 重复了
@@ -325,6 +332,7 @@ class ApiModelSettings(BaseFileSettings):
     """LLM通用对话参数"""
 
     SUPPORT_AGENT_MODELS: t.List[str] = [
+            "glm4-chat-1-0",
             "chatglm3-6b",
             "glm-4",
             "openai-api",
@@ -346,7 +354,7 @@ class ApiModelSettings(BaseFileSettings):
                 "callbacks": False,
             },
             "llm_model": {
-                "model": "",
+                "model": "glm4-chat-1-0",
                 "temperature": 0.9,
                 "max_tokens": 4096,
                 "history_len": 10,
@@ -383,12 +391,12 @@ class ApiModelSettings(BaseFileSettings):
             PlatformConfig(**{
                 "platform_name": "xinference",
                 "platform_type": "xinference",
-                "api_base_url": "http://127.0.0.1:9997/v1",
+                "api_base_url": "http://192.168.170.13:9997/v1",
                 "api_key": "EMPTY",
                 "api_concurrencies": 5,
                 "auto_detect_model": True,
-                "llm_models": [],
-                "embed_models": [],
+                "llm_models": ["glm4-chat-1-0"],
+                "embed_models": ["glm4-chat-1-0"],
                 "text2image_models": [],
                 "image2text_models": [],
                 "rerank_models": [],
@@ -402,12 +410,9 @@ class ApiModelSettings(BaseFileSettings):
                 "api_key": "EMPTY",
                 "api_concurrencies": 5,
                 "llm_models": [
-                    "qwen:7b",
-                    "qwen2:7b",
+   
                 ],
-                "embed_models": [
-                    "quentinz/bge-large-zh-v1.5",
-                ],
+                "embed_models": [],
             }),
             PlatformConfig(**{
                 "platform_name": "oneapi",
@@ -557,7 +562,7 @@ class ToolSettings(BaseFileSettings):
         # crate、duckdb、googlesql、mssql、mysql、mariadb、oracle、postgresql、sqlite、clickhouse、prestodb
         # 不同的数据库请查阅SQLAlchemy用法，修改sqlalchemy_connect_str，配置对应的数据库连接，如sqlite为sqlite:///数据库文件路径，下面示例为mysql
         # 如提示缺少对应数据库的驱动，请自行通过poetry安装
-        "sqlalchemy_connect_str": "mysql+pymysql://用户名:密码@主机地址/数据库名称",
+        "sqlalchemy_connect_str": "mysql+pymysql://root:dx17040207@127.0.0.1:3306/chatchat",
         # 务必评估是否需要开启read_only,开启后会对sql语句进行检查，请确认text2sql.py中的intercept_sql拦截器是否满足你使用的数据库只读要求
         # 优先推荐从数据库层面对用户权限进行限制
         "read_only": False,

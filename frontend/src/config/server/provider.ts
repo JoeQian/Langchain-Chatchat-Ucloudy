@@ -121,8 +121,8 @@ export const getProviderConfig = () => {
     ENABLE_OLLAMA: !!process.env.OLLAMA_PROXY_URL,
     OLLAMA_PROXY_URL: process.env.OLLAMA_PROXY_URL || '',
 
-    CHATCHAT_PROXY_URL: process.env.CHATCHAT_PROXY_URL || '',
-    KNOWLEDGE_PROXY_URL: process.env.KNOWLEDGE_PROXY_URL || 'http://localhost:7861/knowledge_base',
+    CHATCHAT_PROXY_URL: 'http://192.168.170.13:7861/v1',
+    KNOWLEDGE_PROXY_URL: process.env.KNOWLEDGE_PROXY_URL || '',
     // KNOWLEDGE_PROXY_URL: process.env.KNOWLEDGE_PROXY_URL || 'https://beige-points-count.loca.lt/knowledge_base',
   };
 };

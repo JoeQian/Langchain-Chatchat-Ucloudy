@@ -16,7 +16,7 @@ MAX_RETRY_DELAY = 8.0
 
 EMBEDDING_MODEL: str = "bge-large-zh-v1.5"
 HTTPX_TIMEOUT: float = 10.0
-API_BASE_URI: str = 'http://127.0.0.1:7861/'
+API_BASE_URI: str = 'http://192.168.160.140:7861/'
 
 # 知识库相关
 """知识库中单段文本长度(不适用MarkdownHeaderTextSplitter)"""

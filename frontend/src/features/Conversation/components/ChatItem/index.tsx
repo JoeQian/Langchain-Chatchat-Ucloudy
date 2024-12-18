@@ -31,6 +31,7 @@ export interface ChatListItemProps {
 }
 
 const Item = memo<ChatListItemProps>(({ index, id }) => {
+  const [chatMsg,setChatMsg] = useState<string>('')
   const { t } = useTranslation('common');
   const { styles } = useStyles();
   const [editing, setEditing] = useState(false);

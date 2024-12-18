@@ -199,6 +199,7 @@ def get_model_info(
 
 def get_default_llm():
     available_llms = list(get_config_models(model_type="llm").keys())
+    print("available_llms:",available_llms)
     if Settings.model_settings.DEFAULT_LLM_MODEL in available_llms:
         return Settings.model_settings.DEFAULT_LLM_MODEL
     else:
@@ -643,6 +644,11 @@ def webui_address() -> str:
     port = Settings.basic_settings.WEBUI_SERVER["port"]
     return f"http://{host}:{port}"
 
+def admin_address() -> str:
+    # from chatchat.settings import Settings
+    # host = Settings.basic_settings.ADMIN_SERVER["host"]
+    # port = Settings.basic_settings.ADMIN_SERVER["port"]
+    return "http://127.0.0.1:5000"
 
 def get_prompt_template(type: str, name: str) -> Optional[str]:
     """

@@ -185,6 +185,7 @@ async def chat_completions(
             tool_config=extra.get("tool_config", tool_config),
             max_tokens=body.max_tokens,
         )
+        print("result=",result)
         return result
     else:  # LLM chat directly
         try: # query is complex object that unable add to db when using qwen-vl-chat 
@@ -205,6 +206,8 @@ async def chat_completions(
             "message_id": message_id,
             "status": None,
         }
-        return await openai_request(
+        result = await openai_request(
             client.chat.completions.create, body, extra_json=extra_json
         )
+        print("result=",result)
+        return result

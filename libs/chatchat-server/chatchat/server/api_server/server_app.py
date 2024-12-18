@@ -19,6 +19,8 @@ from chatchat.server.chat.completion import completion
 from chatchat.server.utils import MakeFastAPIOffline
 
 
+
+
 def create_app(run_mode: str = None):
     app = FastAPI(title="Langchain-Chatchat API Server", version=__version__)
     MakeFastAPIOffline(app)
@@ -44,6 +46,7 @@ def create_app(run_mode: str = None):
     app.include_router(openai_router)
     app.include_router(server_router)
 
+    
     # 其它接口
     app.post(
         "/other/completion",
@@ -96,4 +99,4 @@ if __name__ == "__main__":
         port=args.port,
         ssl_keyfile=args.ssl_keyfile,
         ssl_certfile=args.ssl_certfile,
-    )
+    ) 

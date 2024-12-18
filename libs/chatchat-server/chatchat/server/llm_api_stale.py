@@ -119,7 +119,7 @@ parser.add_argument(
 parser.add_argument(
     "--limit-worker-concurrency",
     type=int,
-    default=5,
+    default=500,
     help="Limit the model concurrency to prevent OOM.",
 )
 parser.add_argument("--stream-interval", type=int, default=2)

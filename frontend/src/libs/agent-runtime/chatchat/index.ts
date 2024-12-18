@@ -10,7 +10,7 @@ import { desensitizeUrl } from '../utils/desensitizeUrl';
 import { handleOpenAIError } from '../utils/handleOpenAIError';
 import { Stream } from 'openai/streaming';
 
-const DEFAULT_BASE_URL = 'http://localhost:7861/v1';
+const DEFAULT_BASE_URL = 'http://192.168.170.13:7861/';
 // const DEFAULT_BASE_URL = 'https://beige-points-count.loca.lt/v1';
 
 
@@ -32,7 +32,8 @@ export class LobeChatChatAI implements LobeRuntimeAI {
       const response = await this.client.chat.completions.create(
         payload as unknown as (OpenAI.ChatCompletionCreateParamsStreaming | OpenAI.ChatCompletionCreateParamsNonStreaming),
       );
-
+      // console.log(response?.choices[0].message.content);
+      
       if (LobeChatChatAI.isStream(response)) {
 
         const [prod, debug] = response.tee();

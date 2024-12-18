@@ -70,6 +70,7 @@ async def openai_request(
     helper function to make openai request with extra fields
     """
 
+
     async def generator():
         try:
             for x in header:

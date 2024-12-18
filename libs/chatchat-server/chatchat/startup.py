@@ -68,6 +68,43 @@ def run_api_server(
     logging.config.dictConfig(logging_conf)  # type: ignore
     uvicorn.run(app, host=host, port=port)
 
+def run_admin_server(started_event: mp.Event = None, run_mode: str = None):
+    import logging
+    from chatchat.settings import Settings
+    from chatchat.utils import get_config_dict, get_log_file, get_timestamp_ms
+    from fastapi import FastAPI
+    import uvicorn
+
+    # 设置日志配置
+    logger = logging.getLogger(__name__)
+
+    logger.info(f"Admin Server MODEL_PLATFORMS: {Settings.model_settings.MODEL_PLATFORMS}")
+    
+    # 创建 FastAPI 应用
+    app = FastAPI()
+
+    # 可以添加你的路由和逻辑
+    @app.get("/")
+    async def read_root():
+        return {"message": "Admin Server is running"}
+
+    # 设置日志
+    logging_conf = get_config_dict(
+        "INFO",
+        get_log_file(log_path=Settings.basic_settings.LOG_PATH, sub_dir=f"run_admin_server_{get_timestamp_ms()}"),
+        1024 * 1024 * 1024 * 3,
+        1024 * 1024 * 1024 * 3,
+    )
+    logging.config.dictConfig(logging_conf)
+
+    # 启动 Admin 服务器
+    host = "127.0.0.1"
+    port = 5000
+
+    # 启动 Uvicorn 服务器
+
+    uvicorn.run(app, host=host, port=port)
+
 
 def run_webui(
     started_event: mp.Event = None, run_mode: str = None
@@ -179,7 +216,7 @@ def dump_server_info(after_start=False, args=None):
 
     from chatchat import __version__
     from chatchat.settings import Settings
-    from chatchat.server.utils import api_address, webui_address
+    from chatchat.server.utils import api_address, webui_address,admin_address
 
     print("\n")
     print("=" * 30 + "Langchain-Chatchat Configuration" + "=" * 30)
@@ -201,6 +238,8 @@ def dump_server_info(after_start=False, args=None):
             print(f"    Chatchat Api Server: {api_address()}")
         if args.webui:
             print(f"    Chatchat WEBUI Server: {webui_address()}")
+        if args.admin:
+            print(f"    Chatchat Admin Server: {admin_address()}") 
     print("=" * 30 + "Langchain-Chatchat Configuration" + "=" * 30)
     print("\n")
 
@@ -286,6 +325,19 @@ async def start_main_server(args):
             daemon=True,
         )
         processes["webui"] = process
+    # 在 processes 字典初始化后添加
+    admin_started = manager.Event()
+    if args.admin:  # 添加一个新的命令行参数
+        process = Process(
+            target=run_admin_server,
+            name=f"Admin Server",
+            kwargs=dict(
+                started_event=admin_started,
+                run_mode=run_mode,
+            ),
+            daemon=False,
+        )
+        processes["admin"] = process
 
     try:
         if p := processes.get("api"):
@@ -297,6 +349,12 @@ async def start_main_server(args):
             p.start()
             p.name = f"{p.name} ({p.pid})"
             webui_started.wait()  # 等待webui.py启动完成
+        
+                # 在启动进程的代码块中添加
+        if p := processes.get("admin"):
+            p.start()
+            p.name = f"{p.name} ({p.pid})"
+            admin_started.wait()  # 等待admin server启动完成
 
         dump_server_info(after_start=True, args=args)
 
@@ -331,27 +389,42 @@ async def start_main_server(args):
     "--all",
     "all",
     is_flag=True,
-    help="run api.py and webui.py",
+    help="run all servers",
 )
 @click.option(
     "--api",
     "api",
     is_flag=True,
-    help="run api.py",
+    help="run api server",
 )
 @click.option(
     "-w",
     "--webui",
     "webui",
     is_flag=True,
-    help="run webui.py server",
+    help="run webui server",
 )
-def main(all, api, webui):
-    class args:
-        ...
-    args.all = all
-    args.api = api
-    args.webui = webui
+@click.option(
+    "--admin",
+    "admin",
+    is_flag=True,
+    help="run admin server",
+)
+def main(all, api, webui, admin):
+    # 移除 args 类，直接使用函数参数
+    if all:
+        api = True
+        webui = True
+        admin = True
+
+    # 创建一个简单的 Namespace 对象来模拟原来的参数传递方式
+    from types import SimpleNamespace
+    args = SimpleNamespace(
+        all=all,
+        api=api,
+        webui=webui,
+        admin=admin
+    )
 
     # 添加这行代码
     cwd = os.getcwd()

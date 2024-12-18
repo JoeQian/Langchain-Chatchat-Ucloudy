@@ -31,6 +31,7 @@ class OpenAIBaseInput(BaseModel):
         extra = "allow"
 
 
+    
 class OpenAIChatInput(OpenAIBaseInput):
     messages: List[ChatCompletionMessageParam]
     model: str = get_default_llm()
