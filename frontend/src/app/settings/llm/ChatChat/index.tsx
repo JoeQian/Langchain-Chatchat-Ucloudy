@@ -46,7 +46,7 @@ const ChatChatProvider = memo(() => {
           label: t('llm.selectorModel.title'),
         },
         {
-          children: <Checker model={'gml-4'} provider={ModelProvider.ChatChat} />,
+          children: <Checker model={'glm4-chat'} provider={ModelProvider.ChatChat} />,
           desc: t('llm.ChatChat.checker.desc'),
           label: t('llm.checker.title'),
           minWidth: undefined,

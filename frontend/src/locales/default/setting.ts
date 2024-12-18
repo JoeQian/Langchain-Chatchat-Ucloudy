@@ -188,7 +188,7 @@ export default {
       },
       customModelName: {
         desc: '增加自定义模型，多个模型使用逗号（,）隔开',
-        placeholder: 'gml-4',
+        placeholder: 'glm4-chat',
         title: '自定义模型名称',
       },
       endpoint: {

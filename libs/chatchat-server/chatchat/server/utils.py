@@ -167,7 +167,7 @@ def get_config_models(
             elif not models:
                 continue
             for m_name in models:
-                if model_name is None or model_name == m_name:
+                if model_name is None or model_name.lower() in m_name.lower():
                     result[m_name] = {
                         "platform_name": m.get("platform_name"),
                         "platform_type": m.get("platform_type"),
